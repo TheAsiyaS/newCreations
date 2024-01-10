@@ -17,7 +17,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-
 class CardWidget extends StatelessWidget {
   const CardWidget({super.key});
 
@@ -33,24 +32,58 @@ class CardWidget extends StatelessWidget {
                 elevation: 20,
                 color: Colors.transparent,
                 child: Container(
-                  height: 200,
-                  width: 200,
+                  height: 220,
+                  width: 220,
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
                       colors: [Color.fromARGB(255, 87, 78, 69), Colors.black],
                     ),
-                    borderRadius:
-                        BorderRadius.circular(15.0), // Adjust the value as needed
+                    borderRadius: BorderRadius.circular(
+                        15.0), // Adjust the value as needed
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('FLUTTER'),
-                      SizedBox(height: 10),
+                      const Text(
+                        'FLUTTER',
+                        style: TextStyle(letterSpacing: 5, fontSize: 13),
+                      ),
+                      const SizedBox(height: 10),
                       CircularSliderWidget(
                         percentage: 75, // Your skill percentage here
                         size: 100.0,
                       ),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      const Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Column(
+                            children: [
+                              Text('80%'),
+                              SizedBox(
+                                height: 5,
+                              ),
+                              Text(
+                                'Last week',
+                                style: TextStyle(color: Colors.grey),
+                              )
+                            ],
+                          ),
+                          SizedBox(height: 50, child: VerticalDivider()),
+                          Column(
+                            children: [
+                              Text('80%'),
+                              SizedBox(
+                                height: 5,
+                              ),
+                              Text('Last week',
+                                  style: TextStyle(color: Colors.grey))
+                            ],
+                          ),
+                        ],
+                      )
                     ],
                   ),
                 ),
@@ -82,7 +115,7 @@ class _CircularSliderWidgetState extends State<CircularSliderWidget> {
         CustomPaint(
           painter: CircularSliderPainter(
             percentage: widget.percentage,
-            sliderColor:const Color.fromARGB(255, 79, 67, 44),
+            sliderColor: const Color.fromARGB(255, 79, 67, 44),
             baseColor: Colors.transparent,
           ),
           size: Size(widget.size, widget.size),
@@ -140,6 +173,7 @@ class CircularSliderPainter extends CustomPainter {
     return true;
   }
 }
+
 class MyPageView extends StatefulWidget {
   const MyPageView({super.key});
 
