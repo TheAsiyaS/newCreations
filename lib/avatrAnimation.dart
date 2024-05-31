@@ -49,7 +49,7 @@ class _SpinningContainersScreenState extends State<SpinningContainersScreen>
         ),
       ),
     );
-  }
+  }// circle avatater radius : 40 , background colour :  colors.blue child : icons(icons.person,szize :40,coloes: kwhite );
 
   Widget _buildAnimatedContainer(double angle) {
     return AnimatedBuilder(
