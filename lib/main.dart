@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:new_creations/hiddendrawer/drawerscren.dart';
+import 'package:new_creations/hiddendrawer/homedrawer.dart';
 import 'dart:math' as math;
-
-import 'package:new_creations/linesAnimatin.dart';
 
 void main() {
   runApp(MyApp());
@@ -15,7 +15,14 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData.dark(),
-      home: ConnectingLinesScreen(),
+      home: Scaffold(
+        body: Stack(
+          children: [
+            DrawerScreen(),
+            HomeScreen(),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -237,15 +244,5 @@ class MyPage extends StatelessWidget {
  /*
  
 
-Happy Birthday, Miss Poppat! 💕💕
 
-May Allah shower His blessings upon you always. 
-InshaAllah, may you soon embark on the journey of starting your own business. 
-I promise to stand by you and support you every step of the way.
-Remember to nourish yourself with healthy foods, stay active with workouts, and find solace in prayer.
-As you rest tonight, let go of worries and sleep tight.
-Love yourself unconditionally and have faith in your abilities. 
-Keep striving hard for your dreams, for with determination, you will surely achieve them. 
-
-Wishing you a wonderful year ahead filled with success, happiness, and fulfillment. Happy Birthday once again! 🎉🎂
   */

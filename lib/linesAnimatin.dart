@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 class ConnectingLinesScreen extends StatefulWidget {
@@ -30,9 +32,11 @@ class _ConnectingLinesScreenState extends State<ConnectingLinesScreen>
       appBar: AppBar(title: Text('Connecting Lines')),
       body: LayoutBuilder(
         builder: (context, constraints) {
-          final double centerX = constraints.maxWidth / 2;
+         final double centerX = constraints.maxWidth / 2;
           final double centerY = constraints.maxHeight / 2;
-          final double containerSize = 50;
+          const double containerSize = 50;
+          const double additionalPadding = 50;
+
 
           return Stack(
             children: [
@@ -64,7 +68,7 @@ class _ConnectingLinesScreenState extends State<ConnectingLinesScreen>
                 child: Container(width: containerSize, height: containerSize, color: Colors.red),
               ),
               CustomPaint(
-                painter: LinePainter(_controller, centerX, centerY, containerSize),
+                painter: LinePainter(_controller, centerX, centerY, containerSize,additionalPadding),
                 child: Container(),
               ),
             ],
@@ -75,32 +79,47 @@ class _ConnectingLinesScreenState extends State<ConnectingLinesScreen>
   }
 }
 
+
 class LinePainter extends CustomPainter {
   final Animation<double> animation;
   final double centerX;
   final double centerY;
   final double containerSize;
+  final double additionalPadding;
 
-  LinePainter(this.animation, this.centerX, this.centerY, this.containerSize) : super(repaint: animation);
+  LinePainter(this.animation, this.centerX, this.centerY, this.containerSize,
+      this.additionalPadding)
+      : super(repaint: animation);
 
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.blue
+      ..color = Colors.white
       ..strokeWidth = 2.0;
 
     final double endFraction = animation.value;
 
+    // Define the centers of the containers
     final points = [
-      Offset(0 + containerSize / 2, 0 + containerSize / 2),
-      Offset(size.width - containerSize / 2, 0 + containerSize / 2),
-      Offset(0 + containerSize / 2, size.height - containerSize / 2),
+      Offset(containerSize / 2, containerSize / 2),
+      Offset(size.width - containerSize / 2, containerSize / 2),
+      Offset(containerSize / 2, size.height - containerSize / 2),
       Offset(size.width - containerSize / 2, size.height - containerSize / 2),
     ];
 
     for (var point in points) {
-      final endX = centerX + (point.dx - centerX) * endFraction;
-      final endY = centerY + (point.dy - centerY) * endFraction;
+      final dx = point.dx - centerX;
+      final dy = point.dy - centerY;
+      final angle = atan2(dy, dx);
+      final endX = centerX +
+          cos(angle) *
+              (dx.abs() - containerSize / 2 - additionalPadding) *
+              endFraction;
+      final endY = centerY +
+          sin(angle) *
+              (dy.abs() - containerSize / 2 - additionalPadding) *
+              endFraction;
+
       canvas.drawLine(Offset(centerX, centerY), Offset(endX, endY), paint);
     }
   }
@@ -108,8 +127,9 @@ class LinePainter extends CustomPainter {
   @override
   bool shouldRepaint(LinePainter oldDelegate) {
     return oldDelegate.animation != animation ||
-           oldDelegate.centerX != centerX ||
-           oldDelegate.centerY != centerY ||
-           oldDelegate.containerSize != containerSize;
+        oldDelegate.centerX != centerX ||
+        oldDelegate.centerY != centerY ||
+        oldDelegate.containerSize != containerSize ||
+        oldDelegate.additionalPadding != additionalPadding;
   }
 }
