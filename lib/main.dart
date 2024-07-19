@@ -3,29 +3,43 @@ import 'package:new_creations/hiddendrawer/drawerscren.dart';
 import 'package:new_creations/hiddendrawer/homedrawer.dart';
 import 'dart:math' as math;
 
+import 'package:new_creations/listdataIncrement.dart';
+
 void main() {
   runApp(MyApp());
 }
-
-//
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData.dark(),
       home: Scaffold(
-        body: Stack(
-          children: [
-            DrawerScreen(),
-            HomeScreen(),
-          ],
+        appBar: AppBar(
+          title: Text('Increment Button Example'),
         ),
+        body: DataList(),
       ),
     );
   }
 }
+// //
+// class MyApp extends StatelessWidget {
+//   const MyApp({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       theme: ThemeData.dark(),
+//       home: Scaffold(
+//         body: Stack(
+//           children: [
+//             DrawerScreen(),
+//             HomeScreen(),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
 
 class CardWidget extends StatelessWidget {
   const CardWidget({super.key});
