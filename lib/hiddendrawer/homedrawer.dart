@@ -5,6 +5,8 @@ class HomeScreen extends StatelessWidget {
   final ValueNotifier<double> yOffsetNotifier = ValueNotifier<double>(0);
   final ValueNotifier<bool> isDrawerOpenNotifier = ValueNotifier<bool>(false);
 
+  HomeScreen({super.key});
+
   void toggleDrawer() {
     if (isDrawerOpenNotifier.value) {
       xOffsetNotifier.value = 0;
@@ -30,9 +32,9 @@ class HomeScreen extends StatelessWidget {
           )
             ..scale(isDrawerOpen ? 0.85 : 1.00)
             ..rotateZ(isDrawerOpen ? -50 : 0),
-          duration: Duration(milliseconds: 200),
+          duration: const Duration(milliseconds: 200),
           decoration: BoxDecoration(
-            color: Color.fromARGB(255, 52, 72, 84),
+            color: const Color.fromARGB(255, 52, 72, 84),
             borderRadius: isDrawerOpen
                 ? BorderRadius.circular(40)
                 : BorderRadius.circular(0),
@@ -40,19 +42,19 @@ class HomeScreen extends StatelessWidget {
           child: SingleChildScrollView(
             child: Column(
               children: <Widget>[
-                SizedBox(
+                const SizedBox(
                   height: 50,
                 ),
                 Container(
-                  margin: EdgeInsets.symmetric(horizontal: 20),
+                  margin: const EdgeInsets.symmetric(horizontal: 20),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
                       GestureDetector(
-                        child: Icon(isDrawerOpen ? Icons.arrow_back_ios : Icons.menu),
                         onTap: toggleDrawer,
+                        child: Icon(isDrawerOpen ? Icons.arrow_back_ios : Icons.menu),
                       ),
-                      Text(
+                      const Text(
                         'Beautiful Drawer',
                         style: TextStyle(
                           fontSize: 20,
@@ -64,10 +66,10 @@ class HomeScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 40,
                 ),
-                Column(
+                const Column(
                   children: <Widget>[
                     NewPadding(
                       text1: 'Monkey',
@@ -123,7 +125,7 @@ class NewPadding extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 35),
+      padding: const EdgeInsets.symmetric(horizontal: 35),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
@@ -138,7 +140,7 @@ class NewPadding extends StatelessWidget {
                   color: Colors.grey.withOpacity(0.1),
                   spreadRadius: 2,
                   blurRadius: 5,
-                  offset: Offset(0, 0),
+                  offset: const Offset(0, 0),
                 ),
               ],
             ),
@@ -147,7 +149,7 @@ class NewPadding extends StatelessWidget {
               
                 Text(
                   text1,
-                  style: TextStyle(
+                  style: const TextStyle(
                       color: Colors.black87,
                       fontSize: 15,
                       decoration: TextDecoration.none),
@@ -166,7 +168,7 @@ class NewPadding extends StatelessWidget {
                   color: Colors.grey.withOpacity(0.1),
                   spreadRadius: 2,
                   blurRadius: 5,
-                  offset: Offset(0, 0),
+                  offset: const Offset(0, 0),
                 ),
               ],
             ),
@@ -175,7 +177,7 @@ class NewPadding extends StatelessWidget {
                
                 Text(
                   text2,
-                  style: TextStyle(
+                  style: const TextStyle(
                       color: Colors.black87,
                       fontSize: 15,
                       decoration: TextDecoration.none),

@@ -11,7 +11,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _currentIndex = 0;
+  final int _currentIndex = 0;
 
   final List<Widget> _tabs = [
     const MyWidget1(),

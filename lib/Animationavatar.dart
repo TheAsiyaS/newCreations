@@ -4,6 +4,8 @@ import 'dart:math' as math;
 
 
 class SpinningContainersScreen extends StatefulWidget {
+  const SpinningContainersScreen({super.key});
+
   @override
   _SpinningContainersScreenState createState() =>
       _SpinningContainersScreenState();
@@ -18,7 +20,7 @@ class _SpinningContainersScreenState extends State<SpinningContainersScreen>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: Duration(seconds: 5),
+      duration: const Duration(seconds: 5),
     )..repeat();
   }
 
@@ -31,12 +33,12 @@ class _SpinningContainersScreenState extends State<SpinningContainersScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Spinning Containers')),
+      appBar: AppBar(title: const Text('Spinning Containers')),
       body: Center(
         child: Stack(
           alignment: Alignment.center,
           children: <Widget>[
-            CircleAvatar(
+            const CircleAvatar(
               radius: 40,
               backgroundColor: Colors.blue,
               child: Icon(Icons.person, size: 40, color: Colors.white),
@@ -60,7 +62,7 @@ class _SpinningContainersScreenState extends State<SpinningContainersScreen>
         color: Colors.red,
       ),
       builder: (context, child) {
-        final double radius = 100;
+        const double radius = 100;
         final double radians = angle * (math.pi / 180);
         final double x = radius * math.cos(_controller.value * 2 * math.pi + radians);
         final double y = radius * math.sin(_controller.value * 2 * math.pi + radians);

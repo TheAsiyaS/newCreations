@@ -3,6 +3,8 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 class ConnectingLinesScreen extends StatefulWidget {
+  const ConnectingLinesScreen({super.key});
+
   @override
   _ConnectingLinesScreenState createState() => _ConnectingLinesScreenState();
 }
@@ -16,7 +18,7 @@ class _ConnectingLinesScreenState extends State<ConnectingLinesScreen>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: Duration(seconds: 2),
+      duration: const Duration(seconds: 2),
     )..repeat(reverse: true);
   }
 
@@ -29,7 +31,7 @@ class _ConnectingLinesScreenState extends State<ConnectingLinesScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Connecting Lines')),
+      appBar: AppBar(title: const Text('Connecting Lines')),
       body: LayoutBuilder(
         builder: (context, constraints) {
          final double centerX = constraints.maxWidth / 2;
@@ -40,7 +42,7 @@ class _ConnectingLinesScreenState extends State<ConnectingLinesScreen>
 
           return Stack(
             children: [
-              Center(
+              const Center(
                 child: CircleAvatar(
                   radius: 40,
                   backgroundColor: Colors.blue,

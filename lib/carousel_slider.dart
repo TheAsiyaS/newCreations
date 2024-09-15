@@ -12,10 +12,10 @@ class carouselSlider extends StatelessWidget {
       ),
       body: ListView(
         children: [
-          Text('df'),
+          const Text('df'),
           Row(
             children: [
-              Icon(Icons.arrow_back),
+              const Icon(Icons.arrow_back),
               SizedBox(
                 height: 100,
                 width: 300,
@@ -101,7 +101,7 @@ class carouselSlider extends StatelessWidget {
                   ),
                 ),
               ),
-              Icon(Icons.forward),
+              const Icon(Icons.forward),
             ],
           ),
         ],

@@ -6,6 +6,8 @@ import 'package:sqflite/sqflite.dart';
 
 
 class UserListPage extends StatefulWidget {
+  const UserListPage({super.key});
+
   @override
   _UserListPageState createState() => _UserListPageState();
 }
@@ -53,7 +55,7 @@ class _UserListPageState extends State<UserListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Flutter Sqflite Demo'),
+        title: const Text('Flutter Sqflite Demo'),
       ),
       body: ListView.builder(
         itemCount: _users.length,
@@ -67,11 +69,11 @@ class _UserListPageState extends State<UserListPage> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 IconButton(
-                  icon: Icon(Icons.edit),
+                  icon: const Icon(Icons.edit),
                   onPressed: () => _updateUser(user['id']),
                 ),
                 IconButton(
-                  icon: Icon(Icons.delete),
+                  icon: const Icon(Icons.delete),
                   onPressed: () => _deleteUser(user['id']),
                 ),
               ],
@@ -80,8 +82,8 @@ class _UserListPageState extends State<UserListPage> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
         onPressed: _addUser,
+        child: Icon(Icons.add),
       ),
     );
   }

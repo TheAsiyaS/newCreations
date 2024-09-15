@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'dart:math';
 
 class SolarSystemAnimation extends StatefulWidget {
+  const SolarSystemAnimation({super.key});
+
   @override
   _SolarSystemAnimationState createState() => _SolarSystemAnimationState();
 }
 
-class _SolarSystemAnimationState extends State<SolarSystemAnimation> with SingleTickerProviderStateMixin {
+class _SolarSystemAnimationState extends State<SolarSystemAnimation>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
   @override
@@ -14,7 +17,7 @@ class _SolarSystemAnimationState extends State<SolarSystemAnimation> with Single
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: Duration(seconds: 5), // Controls the speed of rotation
+      duration: const Duration(seconds: 15), // Controls the speed of rotation
     )..repeat(); // Repeat the animation indefinitely
   }
 
@@ -32,7 +35,7 @@ class _SolarSystemAnimationState extends State<SolarSystemAnimation> with Single
           alignment: Alignment.center,
           children: [
             // Central Circle
-            CircleAvatar(
+            const CircleAvatar(
               radius: 50, // Adjust the size of the central circle
               backgroundColor: Colors.blue,
             ),
@@ -44,13 +47,13 @@ class _SolarSystemAnimationState extends State<SolarSystemAnimation> with Single
                 builder: (context, child) {
                   return Transform.translate(
                     offset: Offset(
-                      100 * cos(_controller.value * 2 * pi + angle),
-                      100 * sin(_controller.value * 2 * pi + angle),
+                      100 * cos(_controller.value * 3 * pi / 2 + angle),
+                      100 * sin(_controller.value * 2 * pi/5 + angle),
                     ),
                     child: child,
                   );
                 },
-                child: CircleAvatar(
+                child: const CircleAvatar(
                   radius: 10, // Adjust the size of the rotating balls
                   backgroundColor: Colors.orange,
                 ),
@@ -62,4 +65,3 @@ class _SolarSystemAnimationState extends State<SolarSystemAnimation> with Single
     );
   }
 }
-

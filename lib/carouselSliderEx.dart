@@ -27,7 +27,7 @@ class _CarouselSliderPageViewState extends State<CarouselSliderPageView> {
   void _startAutoPlay() {
     Future.delayed(const Duration(seconds: 2), () {
       _pageController.nextPage(
-        duration: Duration(milliseconds: 800),
+        duration: const Duration(milliseconds: 800),
         curve: Curves.fastOutSlowIn,
       );
       _startAutoPlay();
