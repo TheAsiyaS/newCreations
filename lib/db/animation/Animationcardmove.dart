@@ -1,10 +1,8 @@
 // flutter card movement 3,2,1 animation (fan shuffle)
-
-
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'dart:math';
+import 'dart:ui';
+
 
 class FanCardAnimation extends StatefulWidget {
   @override
@@ -12,51 +10,93 @@ class FanCardAnimation extends StatefulWidget {
 }
 
 class _FanCardAnimationState extends State<FanCardAnimation>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _animation;
-  bool isFanned = false;
+    with TickerProviderStateMixin {
+  late AnimationController entryController;
+  late AnimationController staggerController;
+
+  late Animation<double> entryAnimation;
+late Animation<double> blueOffsetAnim;
+late Animation<double> greenOffsetAnim;
+late Animation<double> redOffsetAnim;
+
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      duration: Duration(milliseconds: 500),
+
+    // First controller: All cards enter from left
+    entryController = AnimationController(
+      duration: Duration(milliseconds: 600),
+      vsync: this,
+    );
+    entryAnimation = CurvedAnimation(
+      parent: entryController,
+      curve: Curves.easeOutBack,
+    );
+
+    // Second controller: stagger movement to reveal the cards
+    staggerController = AnimationController(
+      duration: Duration(milliseconds: 700),
       vsync: this,
     );
 
-    _animation = CurvedAnimation(parent: _controller, curve: Curves.easeInOut);
-  }
+    blueOffsetAnim = Tween<double>(begin:0,end:  30).animate(
+      CurvedAnimation(
+        parent: staggerController,
+        curve: Interval(0.0, 0.4, curve: Curves.easeOut),
+      ),
+    );
 
-  void toggleFan() {
-    setState(() {
-      isFanned = !isFanned;
-      if (isFanned) {
-        _controller.forward();
-      } else {
-        _controller.reverse();
-      }
+    greenOffsetAnim = Tween<double>(begin: 0,end: 30).animate(
+      CurvedAnimation(
+        parent: staggerController,
+        curve: Interval(0.4, 0.8, curve: Curves.easeOut),
+      ),
+    );
+redOffsetAnim = Tween<double>(begin: 0, end: 30).animate(
+  CurvedAnimation(
+    parent: staggerController,
+    curve: Interval(0.8, 1.0, curve: Curves.easeOut),
+  ),
+);
+
+    // Start animation sequence
+    Future.delayed(Duration(milliseconds: 300), () async {
+      await entryController.forward();
+      await staggerController.forward();
     });
   }
 
-  Widget buildCard(Color color, double angle, double offset, int index) {
+  Widget buildCard({
+    required Color color,
+    required double angle,
+    required double finalDx,
+    required double verticalOffset,
+    required Animation<double> revealOffset,
+    required double scale,
+  }) {
     return AnimatedBuilder(
-      animation: _animation,
+      animation: Listenable.merge([entryAnimation, staggerController]),
       builder: (context, child) {
-        final rotate = lerpDouble(0, angle, _animation.value)!;
-        final dx = lerpDouble(0, offset, _animation.value)!;
+        final dx = lerpDouble(-200, finalDx + revealOffset.value, entryAnimation.value)!;
+        final rotate = lerpDouble(0, angle, entryAnimation.value)!;
+        final sc = lerpDouble(0.9, scale, entryAnimation.value)!;
+
         return Transform.translate(
-          offset: Offset(dx, -index * 10.0),
+          offset: Offset(dx, verticalOffset),
           child: Transform.rotate(
             angle: rotate,
-            child: child,
+            child: Transform.scale(
+              scale: sc,
+              child: child,
+            ),
           ),
         );
       },
       child: Card(
-        elevation: 8,
+        elevation: 6,
         color: color,
-        child: SizedBox(width: 120, height: 160),
+        child: const SizedBox(width: 120, height: 160),
       ),
     );
   }
@@ -64,27 +104,51 @@ class _FanCardAnimationState extends State<FanCardAnimation>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Fan Shuffle Animation')),
+      backgroundColor: Colors.black,
       body: Center(
         child: Stack(
           alignment: Alignment.center,
           children: [
-            buildCard(Colors.red, -pi / 8, -60, 2),
-            buildCard(Colors.green, 0, 0, 1),
-            buildCard(Colors.blue, pi / 8, 60, 0),
+            // Red (bottom card)
+            buildCard(
+              color: Colors.red.shade700,
+              angle: -pi / 20,
+              finalDx: -10,
+              verticalOffset: 0,
+              revealOffset: redOffsetAnim,
+              scale: 0.9,
+            ),
+
+            // Green (middle)
+            buildCard(
+              color: Colors.green.shade700,
+              angle: 0,
+              finalDx: 0,
+              verticalOffset: -10,
+              revealOffset: greenOffsetAnim,
+              scale: 0.95,
+            ),
+
+            // Blue (top card)
+            buildCard(
+              color: Colors.blue.shade700,
+              angle: pi / 20,
+              finalDx: 10,
+              verticalOffset: -20,
+              revealOffset: blueOffsetAnim,
+              scale: 1.0,
+            ),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: toggleFan,
-        child: Icon(Icons.shuffle),
       ),
     );
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    entryController.dispose();
+    staggerController.dispose();
     super.dispose();
   }
 }
+
