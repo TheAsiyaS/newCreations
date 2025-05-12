@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:new_creations/AnimationText.dart';
+import 'package:new_creations/db/animation/AnimationText.dart';
 
 
 void main() {
