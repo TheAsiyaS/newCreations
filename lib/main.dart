@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:new_creations/db/animation/AnimationText.dart';
+import 'package:new_creations/db/animation/Animationcardmove.dart';
 
 
 void main() {
@@ -11,6 +11,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(home: BirdFlyTextAnimation());
+    return MaterialApp(home: FanCardAnimation());
   }
 }
