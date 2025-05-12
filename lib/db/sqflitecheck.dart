@@ -83,7 +83,7 @@ class _UserListPageState extends State<UserListPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _addUser,
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
     );
   }

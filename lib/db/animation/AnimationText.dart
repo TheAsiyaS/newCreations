@@ -68,7 +68,7 @@ class _BirdFlyTextAnimationState extends State<BirdFlyTextAnimation>
             child: Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Color.fromARGB(255, 8, 94, 102).withOpacity(0.8),
+                color: const Color.fromARGB(255, 8, 94, 102).withOpacity(0.8),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Row(

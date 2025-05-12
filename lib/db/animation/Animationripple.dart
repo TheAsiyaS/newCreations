@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 
 class RippleImageSlider extends StatefulWidget {
+  const RippleImageSlider({super.key});
+
   @override
   _RippleImageSliderState createState() => _RippleImageSliderState();
 }
@@ -27,7 +29,7 @@ class _RippleImageSliderState extends State<RippleImageSlider>
 
     _controller = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 600),
     );
 
     _scaleAnim = Tween<double>(
@@ -37,7 +39,7 @@ class _RippleImageSliderState extends State<RippleImageSlider>
 
     _controller.forward();
 
-    _timer = Timer.periodic(Duration(seconds: 4), (_) {
+    _timer = Timer.periodic(const Duration(seconds: 4), (_) {
       _controller.forward(from: 0.0);
       setState(() {
         currentIndex = (currentIndex + 1) % images.length;
@@ -78,7 +80,7 @@ class _RippleImageSliderState extends State<RippleImageSlider>
                   scale: _scaleAnim.value,
                   child: ClipOval(
                     child: AnimatedSwitcher(
-                      duration: Duration(milliseconds: 600),
+                      duration: const Duration(milliseconds: 600),
                       child: Image.network(
                         images[currentIndex],
                         key: ValueKey(images[currentIndex]),
@@ -91,7 +93,7 @@ class _RippleImageSliderState extends State<RippleImageSlider>
                 );
               },
             ),
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
             Row(
               mainAxisSize: MainAxisSize.min,
               children: List.generate(upcoming.length, (i) {

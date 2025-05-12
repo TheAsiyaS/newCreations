@@ -5,6 +5,8 @@ import 'dart:ui';
 
 
 class FanCardAnimation extends StatefulWidget {
+  const FanCardAnimation({super.key});
+
   @override
   _FanCardAnimationState createState() => _FanCardAnimationState();
 }
@@ -26,7 +28,7 @@ late Animation<double> redOffsetAnim;
 
     // First controller: All cards enter from left
     entryController = AnimationController(
-      duration: Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 600),
       vsync: this,
     );
     entryAnimation = CurvedAnimation(
@@ -36,32 +38,32 @@ late Animation<double> redOffsetAnim;
 
     // Second controller: stagger movement to reveal the cards
     staggerController = AnimationController(
-      duration: Duration(milliseconds: 700),
+      duration: const Duration(milliseconds: 700),
       vsync: this,
     );
 
     blueOffsetAnim = Tween<double>(begin:0,end:  30).animate(
       CurvedAnimation(
         parent: staggerController,
-        curve: Interval(0.0, 0.4, curve: Curves.easeOut),
+        curve: const Interval(0.0, 0.4, curve: Curves.easeOut),
       ),
     );
 
     greenOffsetAnim = Tween<double>(begin: 0,end: 30).animate(
       CurvedAnimation(
         parent: staggerController,
-        curve: Interval(0.4, 0.8, curve: Curves.easeOut),
+        curve: const Interval(0.4, 0.8, curve: Curves.easeOut),
       ),
     );
 redOffsetAnim = Tween<double>(begin: 0, end: 30).animate(
   CurvedAnimation(
     parent: staggerController,
-    curve: Interval(0.8, 1.0, curve: Curves.easeOut),
+    curve: const Interval(0.8, 1.0, curve: Curves.easeOut),
   ),
 );
 
     // Start animation sequence
-    Future.delayed(Duration(milliseconds: 300), () async {
+    Future.delayed(const Duration(milliseconds: 300), () async {
       await entryController.forward();
       await staggerController.forward();
     });
@@ -112,11 +114,11 @@ redOffsetAnim = Tween<double>(begin: 0, end: 30).animate(
             // Red (bottom card)
             buildCard(
               color: Colors.red.shade700,
-              angle: -pi / 20,
+              angle: -pi / 30,
               finalDx: -10,
               verticalOffset: 0,
               revealOffset: redOffsetAnim,
-              scale: 0.9,
+              scale: .92,
             ),
 
             // Green (middle)
