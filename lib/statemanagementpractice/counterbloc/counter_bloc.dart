@@ -15,7 +15,7 @@ class CounterBloc extends Bloc<CounterEvent, CounterState> {
   }
     });
 //deceremt
-       on<IncrementCounter>((event, emit) {
+       on<DecrementCounter>((event, emit) {
     final currentState = state;
   if (currentState is CounterInitial) {
     emit(CounterInitial(count: currentState.count -1));
