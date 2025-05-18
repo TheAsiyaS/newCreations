@@ -39,6 +39,7 @@ dependencies:
   path: ^1.8.0
   flutter_animate: ^3.1.0
   flutter_bloc: ^9.1.1
+  freezed_annotation: ^3.0.0 #for making anotations for freezed(eg: @freezed)
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -49,6 +50,7 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
+  freezed: ^3.0.6 # for essey to use bloc
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
