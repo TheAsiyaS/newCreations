@@ -50,7 +50,8 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
-  freezed: ^3.0.6 # for essey to use bloc
+  freezed: ^3.0.6 # for easying writing model like comparing whole data in the 2 class or more ,(copywith , )
+  build_runner: ^2.4.15
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
