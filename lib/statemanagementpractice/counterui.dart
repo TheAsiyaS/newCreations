@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:new_creations/statemanagementpractice/counterbloc/counter_bloc.dart';
+import 'package:new_creations/statemanagementpractice/bloc/countercheck2_bloc.dart';
 
 class CounterAppUI extends StatelessWidget {
   const CounterAppUI({super.key});
@@ -16,8 +16,9 @@ class CounterAppUI extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            BlocBuilder<CounterBloc, CounterState>(builder: (context, state) {
-              return Text('count data :${(state as CounterInitial).count} ');
+            BlocBuilder<Countercheck2Bloc, Countercheck2State>(
+                builder: (context, state) {
+              return Text('count data :${state.count} ');
             }),
             const SizedBox(height: 20), // spacing
             Container(
@@ -35,12 +36,16 @@ class CounterAppUI extends StatelessWidget {
             ),
             IconButton(
                 onPressed: () {
-                  context.read<CounterBloc>().add(const IncrementCounter());
+                  context
+                      .read<Countercheck2Bloc>()
+                      .add(const Countercheck2Event.increment());
                 },
                 icon: const Icon(Icons.add)),
-                    IconButton(
+            IconButton(
                 onPressed: () {
-                  context.read<CounterBloc>().add(const DecrementCounter());
+                  context
+                      .read<Countercheck2Bloc>()
+                      .add(const Countercheck2Event.decrement());
                 },
                 icon: const Icon(Icons.minimize_outlined))
           ],

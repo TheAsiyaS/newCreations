@@ -1,17 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:new_creations/db/animation/Animationtextfade.dart';
-import 'package:new_creations/statemanagementpractice/counterbloc/counter_bloc.dart';
-import 'package:new_creations/statemanagementpractice/counterui.dart';
+import 'package:new_creations/shapes/rectangletopcut.dart';
 
 void main() {
   runApp(
-    MultiBlocProvider(
-      providers: [
-        BlocProvider(create: (_) => CounterBloc()),
-      ],
-      child: const MyApp(),
-    ),
+     const MyApp(),
+ 
   );
 }
 
@@ -20,6 +13,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(home: CounterAppUI());
+    return  MaterialApp(home: TriangleCutExample());
   }
 }
