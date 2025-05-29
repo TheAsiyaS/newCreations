@@ -77,11 +77,11 @@ class HexagonPainter extends CustomPainter {
     const double baseRadius = 30.0;
 
     final paint = Paint()
-      ..style = PaintingStyle.stroke
+      ..style = PaintingStyle.fill
       ..strokeWidth = 2;
 
     final gradient = LinearGradient(
-      colors: [Color.fromARGB(255, 79, 67, 44), Colors.white],
+      colors: [Color.fromARGB(255, 79, 67, 44), const Color.fromARGB(255, 130, 121, 113)],
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
     );
