@@ -1,76 +1,160 @@
-import 'package:flutter/material.dart';
 import 'dart:math';
+import 'package:flutter/material.dart';
 
+class HexagonAnimationScreen extends StatefulWidget {
+  const HexagonAnimationScreen({super.key});
 
-class Honeycomb3DBackground extends StatelessWidget {
-  const Honeycomb3DBackground({super.key});
+  @override
+  State<HexagonAnimationScreen> createState() => _HexagonAnimationScreenState();
+}
+
+class _HexagonAnimationScreenState extends State<HexagonAnimationScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController controller;
+
+  // 6 directions of hex grid (pointy topped)
+  final List<Offset> directions = [
+    Offset(1, 0), // right
+    Offset(0.5, sqrt(3) / 2), // bottom-right
+    Offset(-0.5, sqrt(3) / 2), // bottom-left
+    Offset(-1, 0), // left
+    Offset(-0.5, -sqrt(3) / 2), // top-left
+    Offset(0.5, -sqrt(3) / 2), // top-right
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 5),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final center = MediaQuery.of(context).size.center(Offset.zero);
+
     return Scaffold(
-      body: CustomPaint(
-        size: Size.infinite,
-        painter: Honeycomb3DPainter(),
+      body: AnimatedBuilder(
+        animation: controller,
+        builder: (_, __) {
+          return CustomPaint(
+            painter: HexagonPainter(
+              progress: controller.value,
+              center: center,
+              directions: directions,
+            ),
+            child: Container(),
+          );
+        },
       ),
     );
   }
 }
 
-class Honeycomb3DPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    const double radius = 30;
-    final double hexHeight = sqrt(3) * radius;
-    final double hexWidth = 2 * radius;
-    final double vertSpacing = hexHeight;
-    final double horizSpacing = 1.5 * radius;
+class HexagonPainter extends CustomPainter {
+  final double progress; // 0 to 1
+  final Offset center;
+  final List<Offset> directions;
 
-    for (double y = 0; y < size.height + hexHeight; y += vertSpacing) {
-      for (double x = 0; x < size.width + hexWidth; x += horizSpacing) {
-        final offsetX = x + ((y ~/ vertSpacing) % 2 == 0 ? 0 : radius * 0.75);
-        final offset = Offset(offsetX, y);
-        _draw3DHexagon(canvas, offset, radius);
-      }
+  HexagonPainter({
+    required this.progress,
+    required this.center,
+    required this.directions,
+  });
+
+@override
+void paint(Canvas canvas, Size size) {
+  const double spacing = 80.0;
+  const double hexRadius = 30.0;
+  final paint = Paint()
+    ..style = PaintingStyle.stroke
+    ..strokeWidth = 2;
+
+  final gradient = LinearGradient(
+    colors: [Colors.blue, Colors.white],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  // Use axial coordinates to keep track of visited hexes
+  Set<Offset> visited = {};
+
+  // Define the hex directions for axial coordinates
+  List<Offset> axialDirs = [
+    const Offset(1, 0),
+    const Offset(1, -1),
+    const Offset(0, -1),
+    const Offset(-1, 0),
+    const Offset(-1, 1),
+    const Offset(0, 1),
+  ];
+
+  void drawRecursive(Offset axial, int depth) {
+    if (depth == 0 || visited.contains(axial)) return;
+    visited.add(axial);
+
+    Offset pixel = _axialToPixel(axial, spacing);
+    paint.shader = gradient.createShader(Rect.fromCircle(center: center + pixel, radius: hexRadius));
+    drawHexagon(canvas, center + pixel, hexRadius, paint);
+
+    for (Offset dir in axialDirs) {
+      drawRecursive(axial + dir, depth - 1);
     }
   }
 
-  void _draw3DHexagon(Canvas canvas, Offset center, double radius) {
-    final Path top = Path();
-    final Path left = Path();
-    final Path right = Path();
+  drawRecursive(const Offset(0, 0), 2); // depth 2: center + 6 + 36
+}
 
-    final points = List<Offset>.generate(6, (i) {
-      final angle = pi / 3 * i - pi / 6;
-      return Offset(
-        center.dx + radius * cos(angle),
-        center.dy + radius * sin(angle),
-      );
-    });
+  /// Convert hex axial coords (ring, step, side) to pixel offset (relative to center)
+  /// ring = distance from center, step = index along ring side, side = which of 6 directions
+  Offset _hexToPixel(double ring, double step, int side, double spacing) {
+    // Each ring has 6 sides, each with 'ring' hexes.
+    // Start at direction 'side' * ring and move along next direction.
+    // Directions for corners:
+    final List<Offset> corners = [
+      Offset(1, 0),
+      Offset(0.5, sqrt(3) / 2),
+      Offset(-0.5, sqrt(3) / 2),
+      Offset(-1, 0),
+      Offset(-0.5, -sqrt(3) / 2),
+      Offset(0.5, -sqrt(3) / 2),
+    ];
 
-    // Create 3D effect by drawing 3 faces
-    top.moveTo(points[0].dx, points[0].dy);
-    top.lineTo(points[1].dx, points[1].dy);
-    top.lineTo(points[2].dx, points[2].dy);
-    top.lineTo(center.dx, center.dy);
-    top.close();
+    Offset start = corners[side] * ring * spacing;
+    Offset next = corners[(side + 1) % 6] * step * spacing;
 
-    right.moveTo(points[2].dx, points[2].dy);
-    right.lineTo(points[3].dx, points[3].dy);
-    right.lineTo(points[4].dx, points[4].dy);
-    right.lineTo(center.dx, center.dy);
-    right.close();
+    return start + next;
+  }
 
-    left.moveTo(points[4].dx, points[4].dy);
-    left.lineTo(points[5].dx, points[5].dy);
-    left.lineTo(points[0].dx, points[0].dy);
-    left.lineTo(center.dx, center.dy);
-    left.close();
-
-    canvas.drawPath(top, Paint()..color = Colors.amber.shade300);
-    canvas.drawPath(right, Paint()..color = Colors.orange.shade700);
-    canvas.drawPath(left, Paint()..color = Colors.orange.shade400);
+  void drawHexagon(Canvas canvas, Offset center, double radius, Paint paint) {
+    final path = Path();
+    for (int i = 0; i <= 6; i++) {
+      final angle = pi / 3 * i - pi / 6; // rotate to pointy-top hexagon
+      final x = center.dx + radius * cos(angle);
+      final y = center.dy + radius * sin(angle);
+      if (i == 0) {
+        path.moveTo(x, y);
+      } else {
+        path.lineTo(x, y);
+      }
+    }
+    canvas.drawPath(path, paint);
   }
 
   @override
-  bool shouldRepaint(CustomPainter oldDelegate) => false;
+  bool shouldRepaint(HexagonPainter oldDelegate) => true;
+  
+Offset _axialToPixel(Offset axial, double spacing) {
+  double x = spacing * (sqrt(3) * axial.dx + sqrt(3) / 2 * axial.dy);
+  double y = spacing * (3 / 2 * axial.dy);
+  return Offset(x, y);
+}
 }

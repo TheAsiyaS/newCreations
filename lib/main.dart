@@ -12,6 +12,10 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(home: Honeycomb3DBackground());
+    return MaterialApp(
+        darkTheme: ThemeData(
+          brightness: Brightness.dark,
+        ),
+        home: HexagonAnimationScreen());
   }
 }
