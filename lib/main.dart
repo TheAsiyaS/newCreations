@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:new_creations/shapes/rectangletopcut.dart';
+import 'package:new_creations/shapes/infinityshape.dart';
 
 void main() {
   runApp(
-     const MyApp(),
- 
+    const MyApp(),
   );
 }
 
@@ -13,6 +12,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return  MaterialApp(home: TriangleCutExample());
+    return const MaterialApp(home: Honeycomb3DBackground());
   }
 }
