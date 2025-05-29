@@ -5,8 +5,7 @@ class HexagonAnimationScreen extends StatefulWidget {
   const HexagonAnimationScreen({super.key});
 
   @override
-  State<HexagonAnimationScreen> createState() =>
-      _HexagonAnimationScreenState();
+  State<HexagonAnimationScreen> createState() => _HexagonAnimationScreenState();
 }
 
 class _HexagonAnimationScreenState extends State<HexagonAnimationScreen>
@@ -46,13 +45,24 @@ class _HexagonAnimationScreenState extends State<HexagonAnimationScreen>
       body: AnimatedBuilder(
         animation: controller,
         builder: (_, __) {
-          return CustomPaint(
-            painter: HexagonPainter(
-              progress: controller.value,
-              center: center,
-              directions: directions,
+          return Container(
+            height: 400,
+            width: 400,
+            child: LayoutBuilder(
+              builder: (_, constraints) {
+                final localCenter = Offset(
+                  constraints.maxWidth / 2,
+                  constraints.maxHeight / 2,
+                );
+                return CustomPaint(
+                  painter: HexagonPainter(
+                    progress: controller.value,
+                    center: localCenter,
+                    directions: directions,
+                  ),
+                );
+              },
             ),
-            child: Container(),
           );
         },
       ),
@@ -80,16 +90,19 @@ class HexagonPainter extends CustomPainter {
       ..style = PaintingStyle.fill
       ..strokeWidth = 2;
 
-    final gradient = LinearGradient(
-      colors: [Color.fromARGB(255, 79, 67, 44), const Color.fromARGB(255, 130, 121, 113)],
+    const gradient = LinearGradient(
+      colors: [
+        Color.fromARGB(255, 79, 67, 44),
+        Color.fromARGB(255, 130, 121, 113)
+      ],
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
     );
 
     final animatedRadius = baseRadius * (1 + 0.2 * sin(progress * 2 * pi));
 
-    paint.shader =
-        gradient.createShader(Rect.fromCircle(center: center, radius: animatedRadius));
+    paint.shader = gradient
+        .createShader(Rect.fromCircle(center: center, radius: animatedRadius));
     drawHexagon(canvas, center, animatedRadius, paint);
 
     // Ring 1
@@ -98,7 +111,8 @@ class HexagonPainter extends CustomPainter {
       final pos = center + dir * spacing;
       ring1Centers.add(pos);
 
-      paint.shader = gradient.createShader(Rect.fromCircle(center: pos, radius: animatedRadius));
+      paint.shader = gradient
+          .createShader(Rect.fromCircle(center: pos, radius: animatedRadius));
       drawHexagon(canvas, pos, animatedRadius, paint);
     }
 
@@ -107,7 +121,8 @@ class HexagonPainter extends CustomPainter {
       for (final dir in directions) {
         final pos = hexCenter + dir * spacing;
 
-        paint.shader = gradient.createShader(Rect.fromCircle(center: pos, radius: animatedRadius));
+        paint.shader = gradient
+            .createShader(Rect.fromCircle(center: pos, radius: animatedRadius));
         drawHexagon(canvas, pos, animatedRadius, paint);
       }
     }

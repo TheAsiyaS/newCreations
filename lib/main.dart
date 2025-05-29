@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:new_creations/shapes/infinityshape.dart';
+import 'package:new_creations/shapes/hexagon.dart';
 
 void main() {
   runApp(
