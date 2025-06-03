@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:new_creations/shapes/cardwithcircle.dart';
-import 'package:new_creations/shapes/hexagon.dart';
-import 'package:new_creations/shapes/hexagonstill.dart';
-import 'package:new_creations/shapes/rectangletopcut.dart' show TriangleCutExample;
+import 'package:new_creations/shapes/star.dart';
 
 void main() {
   runApp(
@@ -19,6 +16,6 @@ class MyApp extends StatelessWidget {
         darkTheme: ThemeData(
           brightness: Brightness.dark,
         ),
-        home: CircleWithRectanglesDemo());
+        home: StarburstBadge());
   }
 }
