@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:new_creations/animation/cradmovetoright.dart';
 import 'package:new_creations/shapes/star.dart';
 
 void main() {
@@ -16,6 +17,6 @@ class MyApp extends StatelessWidget {
         darkTheme: ThemeData(
           brightness: Brightness.dark,
         ),
-        home: StarburstBadge());
+        home: AnimatedWorkCards());
   }
 }
