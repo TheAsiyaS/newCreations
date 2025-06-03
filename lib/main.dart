@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:new_creations/shapes/hexagon.dart';
+import 'package:new_creations/shapes/hexagonstill.dart';
+import 'package:new_creations/shapes/rectangletopcut.dart' show TriangleCutExample;
 
 void main() {
   runApp(
@@ -16,6 +18,6 @@ class MyApp extends StatelessWidget {
         darkTheme: ThemeData(
           brightness: Brightness.dark,
         ),
-        home: HexagonAnimationScreen());
+        home: HexagonScreen());
   }
 }
