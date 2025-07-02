@@ -76,7 +76,7 @@ class _RotatingImageContainerState extends State<RotatingImageContainer>
           _controller.forward();
         }
       }
-    });
+    });  
   }
 
   @override
