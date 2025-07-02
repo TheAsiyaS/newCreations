@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:new_creations/animation/cradmovetoright.dart';
-import 'package:new_creations/shapes/star.dart';
+import 'package:new_creations/animation/rectangleup.dart';
+
 
 void main() {
   runApp(
@@ -17,6 +17,6 @@ class MyApp extends StatelessWidget {
         darkTheme: ThemeData(
           brightness: Brightness.dark,
         ),
-        home: AnimatedWorkCards());
+        home: RotatingImageContainer());
   }
 }

@@ -49,24 +49,39 @@ class _AnimatedWorkCardsState extends State<AnimatedWorkCards> {
                 curve: Curves.easeOut,
                 top: 20,
                 left: leftPositions[index],
-                child: Card(
-                  elevation: 6,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  color: Colors.white,
-                  child: SizedBox(
-                    width: cardWidth,
-                    height: 200,
-                    child: Center(
-                      child: Text(
-                        cardTitles[index],
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                child: SizedBox(
+                  width: cardWidth +
+                      ( 10 ), // extra space for divider
+                  height: 200,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Card(
+                        elevation: 6,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        color: Colors.white,
+                        child: SizedBox(
+                          width: cardWidth,
+                          height: 200,
+                          child: Center(
+                            child: Text(
+                              cardTitles[index],
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
-                    ),
+                      if (index != 4)
+                        Container(
+                          width: 1,
+                          color: const Color.fromARGB(255, 136, 22, 22),
+                        ),
+                    ],
                   ),
                 ),
               );
