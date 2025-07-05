@@ -1,9 +1,7 @@
 import 'dart:collection';
 import 'dart:math';
 import 'package:flutter/material.dart';
-
-
-
+///////////////////////////////////////////////////// b2
 class BeehiveAnimationPage extends StatefulWidget {
   const BeehiveAnimationPage({super.key});
 
@@ -12,40 +10,52 @@ class BeehiveAnimationPage extends StatefulWidget {
 }
 
 class _BeehiveAnimationPageState extends State<BeehiveAnimationPage>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
+    with TickerProviderStateMixin { // <-- MODIFIED: Need TickerProviderStateMixin for two controllers
+  // <-- NEW: Two controllers for two animation phases
+  late AnimationController _growthController;
+  late AnimationController _driftController;
+
   List<Hex> _hive = [];
   final random = Random();
 
   // --- Animation & Hive Configuration ---
-  // <-- MODIFIED: Replaced maxHexagons with a clear radius.
-  // The center is ring 0, so a radius of 7 creates 7 outer rings.
-  final int hiveRadius = 5;
+  final int hiveRadius = 7;
   final double hexSize = 30.0;
   final double spacingFactor = 0.9;
+  // <-- NEW: Controls how far the hexagons drift from their position
+  final double driftAmount = 4.0;
 
-  // A beautiful palette of honey-like colors
   final List<Color> _honeyColors = [
-    const Color(0xFFFFC107), // Amber
-    const Color(0xFFFFD54F), // Amber[300]
-    const Color(0xFFFFB300), // Amber[700]
-    const Color(0xFFFFCA28), // Amber[400]
-    const Color(0xFFFFE082), // Amber[200]
-    const Color(0xFFFFA000), // Amber[800]
-    const Color(0xFFFB8C00), // Orange[600]
+    const Color(0xFFFFC107), const Color(0xFFFFD54F),
+    const Color(0xFFFFB300), const Color(0xFFFFCA28),
+    const Color(0xFFFFE082), const Color(0xFFFFA000),
+    const Color(0xFFFB8C00),
   ];
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      // <-- MODIFIED: Shorter duration for a smaller hive.
+    // Controller for the initial growth animation
+    _growthController = AnimationController(
       duration: const Duration(seconds: 8),
       vsync: this,
     );
 
+    // Controller for the continuous drifting animation
+    _driftController = AnimationController(
+      duration: const Duration(seconds: 10), // Speed of one drift cycle
+      vsync: this,
+    );
+
+    // When the growth is complete, start the drifting animation
+    _growthController.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        _driftController.repeat(); // Loop the drift animation
+      }
+    });
+
     _generateHive();
-    _controller.forward();
+    _growthController.forward();
   }
 
   void _generateHive() {
@@ -56,69 +66,74 @@ class _BeehiveAnimationPageState extends State<BeehiveAnimationPage>
     final centerHex = Hex(
       0, 0, 0,
       _honeyColors[random.nextInt(_honeyColors.length)],
+      // <-- NEW: Generate drift properties for the center hex
+      driftOffset: Offset(
+        (random.nextDouble() - 0.5) * driftAmount,
+        (random.nextDouble() - 0.5) * driftAmount,
+      ),
+      driftPhase: random.nextDouble(),
     );
     queue.add(centerHex);
     visited.add(centerHex);
     growthOrder.add(centerHex);
 
-    // <-- MODIFIED: The loop condition is simpler now.
     while (queue.isNotEmpty) {
       final current = queue.removeFirst();
-      final neighbors = current.getNeighbors();
-
-      for (final neighbor in neighbors) {
-        // <-- MODIFIED: The main logic change is here!
-        // We now check if the neighbor is within our desired radius
-        // before adding it to the hive.
-        if (!visited.contains(neighbor) &&
-            neighbor.distanceFromCenter() <= hiveRadius) {
+      for (final neighbor in current.getNeighbors()) {
+        if (!visited.contains(neighbor) && neighbor.distanceFromCenter() <= hiveRadius) {
           visited.add(neighbor);
           final newHex = Hex(
             neighbor.q, neighbor.r, neighbor.s,
             _honeyColors[random.nextInt(_honeyColors.length)],
+            // <-- NEW: Generate unique drift properties for each new hex
+            driftOffset: Offset(
+              (random.nextDouble() - 0.5) * driftAmount,
+              (random.nextDouble() - 0.5) * driftAmount,
+            ),
+            driftPhase: random.nextDouble(),
           );
           queue.add(newHex);
           growthOrder.add(newHex);
         }
       }
     }
-    setState(() {
-      _hive = growthOrder;
-    });
+    setState(() { _hive = growthOrder; });
   }
 
   void _restartAnimation() {
+    _driftController.stop(); // Stop the old drift
+    _driftController.reset();
+    _growthController.reset();
     _generateHive();
-    _controller.reset();
-    _controller.forward();
+    _growthController.forward(); // Start the growth again
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    // <-- MODIFIED: Dispose of both controllers
+    _growthController.dispose();
+    _driftController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Added a background color to better see the hive
       backgroundColor: const Color(0xFF2D3436),
       body: Stack(
         children: [
           Center(
             child: AnimatedBuilder(
-              animation: _controller,
+              // <-- MODIFIED: Listen to both controllers for updates
+              animation: Listenable.merge([_growthController, _driftController]),
               builder: (context, child) {
                 return CustomPaint(
-                  // We don't need double.infinity anymore. We can give it a specific
-                  // size to contain our hive, which is more efficient.
-                  // (radius * 2 + 1) * hexSize gives a good bounding box.
-                  // <-- MODIFIED: Sized the painter to fit the hive.
-                  size: Size.square((hiveRadius * 2 + 1) * hexSize),
+                  size: Size.square((hiveRadius * 2 + 1) * hexSize + driftAmount * 2),
                   painter: BeehivePainter(
                     hive: _hive,
-                    progress: _controller.value,
+                    // <-- MODIFIED: Pass both progress values to the painter
+                    growthProgress: _growthController.value,
+                    driftProgress: _driftController.value,
                     hexSize: hexSize,
                     spacingFactor: spacingFactor,
                   ),
@@ -126,25 +141,37 @@ class _BeehiveAnimationPageState extends State<BeehiveAnimationPage>
               },
             ),
           ),
-         
+          Positioned(
+            bottom: 30, left: 0, right: 0,
+            child: Center(
+              child: FloatingActionButton.extended(
+                onPressed: _restartAnimation,
+                icon: const Icon(Icons.refresh),
+                label: const Text('Regenerate'),
+                backgroundColor: Colors.black.withOpacity(0.5),
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
 }
 
+
 // --- The Custom Painter for Drawing the Hive ---
-// No changes needed here, but I've removed the culling logic as it's
-// not necessary for a small, fixed-size hive.
 class BeehivePainter extends CustomPainter {
   final List<Hex> hive;
-  final double progress;
+  final double growthProgress;
+  // <-- NEW: Progress for the drift animation (0.0 to 1.0, repeating)
+  final double driftProgress;
   final double hexSize;
   final double spacingFactor;
 
   BeehivePainter({
     required this.hive,
-    required this.progress,
+    required this.growthProgress,
+    required this.driftProgress, // <-- NEW
     required this.hexSize,
     required this.spacingFactor,
   });
@@ -152,30 +179,39 @@ class BeehivePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final center = size.center(Offset.zero);
-
     final fillPaint = Paint()..style = PaintingStyle.fill;
-    final borderPaint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5;
+    final borderPaint = Paint()..style = PaintingStyle.stroke..strokeWidth = 1.5;
 
-    final int hexagonsToShow = (hive.length * progress).floor();
+    final int hexagonsToShow = (hive.length * growthProgress).floor();
     final double visualHexSize = hexSize * spacingFactor;
 
     for (int i = 0; i < hexagonsToShow; i++) {
       final hex = hive[i];
-      final hexCenter = hex.toPixel(center, hexSize);
+      // Start with the hex's original, static position
+      var hexCenter = hex.toPixel(center, hexSize);
 
-      double hexProgress = 1.0;
-      if (i == hexagonsToShow - 1 && progress < 1.0) {
-        hexProgress = (progress * hive.length) - hexagonsToShow + 1;
+      // <-- NEW: Apply drift *after* growth is complete
+      if (growthProgress == 1.0) {
+        // Use a sine wave for smooth, back-and-forth motion
+        final driftAngle = 2 * pi * (driftProgress + hex.driftPhase);
+        final driftOffset = Offset(
+          hex.driftOffset.dx * sin(driftAngle),
+          hex.driftOffset.dy * sin(driftAngle),
+        );
+        hexCenter += driftOffset;
       }
 
-      final hexPath = _createHexagonPath(hexCenter, visualHexSize * hexProgress);
+      double hexScaleProgress = 1.0;
+      if (i == hexagonsToShow - 1 && growthProgress < 1.0) {
+        hexScaleProgress = (growthProgress * hive.length) - hexagonsToShow + 1;
+      }
+
+      final hexPath = _createHexagonPath(hexCenter, visualHexSize * hexScaleProgress);
       final hexColor = hex.color;
-      final animationOpacity = (0.8 * hexProgress);
+      final animationOpacity = (0.8 * hexScaleProgress);
 
       fillPaint.color = hexColor.withOpacity(animationOpacity);
-      borderPaint.color = Colors.black.withOpacity(0.2 * hexProgress);
+      borderPaint.color = Colors.black.withOpacity(0.2 * hexScaleProgress);
 
       canvas.drawPath(hexPath, fillPaint);
       canvas.drawPath(hexPath, borderPaint);
@@ -186,10 +222,7 @@ class BeehivePainter extends CustomPainter {
     final path = Path();
     for (int i = 0; i < 6; i++) {
       final angle = (pi / 3) * i + (pi / 6);
-      final point = Offset(
-        center.dx + size * cos(angle),
-        center.dy + size * sin(angle),
-      );
+      final point = Offset(center.dx + size * cos(angle), center.dy + size * sin(angle));
       if (i == 0) {
         path.moveTo(point.dx, point.dy);
       } else {
@@ -202,7 +235,10 @@ class BeehivePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant BeehivePainter oldDelegate) {
-    return oldDelegate.progress != progress || oldDelegate.hive != hive;
+    // <-- MODIFIED: Repaint if either progress value changes
+    return oldDelegate.growthProgress != growthProgress ||
+        oldDelegate.driftProgress != driftProgress ||
+        oldDelegate.hive != hive;
   }
 }
 
@@ -212,26 +248,31 @@ class Hex {
   final int r;
   final int s;
   final Color color;
+  // <-- NEW: Properties to give each hex its own unique movement
+  final Offset driftOffset;
+  final double driftPhase;
 
-  Hex(this.q, this.r, this.s, this.color) {
+  Hex(this.q, this.r, this.s, this.color,
+      {required this.driftOffset, required this.driftPhase}) { // <-- NEW
     assert(q + r + s == 0, "Hex coordinates must sum to 0");
   }
 
-  //<-- NEW: Helper method to calculate distance from the center hex (0,0,0).
   int distanceFromCenter() {
-    // In cube coordinates, distance is half the sum of the absolute values.
-    // We use integer division `~/` to get a whole number.
     return (q.abs() + r.abs() + s.abs()) ~/ 2;
   }
 
   static final List<Hex> directions = [
-    Hex(1, 0, -1, Colors.transparent), Hex(1, -1, 0, Colors.transparent),
-    Hex(0, -1, 1, Colors.transparent), Hex(-1, 0, 1, Colors.transparent),
-    Hex(-1, 1, 0, Colors.transparent), Hex(0, 1, -1, Colors.transparent),
+    Hex(1, 0, -1, Colors.transparent, driftOffset: Offset.zero, driftPhase: 0),
+    Hex(1, -1, 0, Colors.transparent, driftOffset: Offset.zero, driftPhase: 0),
+    Hex(0, -1, 1, Colors.transparent, driftOffset: Offset.zero, driftPhase: 0),
+    Hex(-1, 0, 1, Colors.transparent, driftOffset: Offset.zero, driftPhase: 0),
+    Hex(-1, 1, 0, Colors.transparent, driftOffset: Offset.zero, driftPhase: 0),
+    Hex(0, 1, -1, Colors.transparent, driftOffset: Offset.zero, driftPhase: 0),
   ];
 
   Hex operator +(Hex other) {
-    return Hex(q + other.q, r + other.r, s + other.s, color);
+    return Hex(q + other.q, r + other.r, s + other.s, color,
+        driftOffset: driftOffset, driftPhase: driftPhase);
   }
 
   List<Hex> getNeighbors() {

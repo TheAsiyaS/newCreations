@@ -85,6 +85,7 @@ class _RotatingImageContainerState extends State<RotatingImageContainer>
       crossAxisAlignment: CrossAxisAlignment.end,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
+        CircleAvatar(),
         GestureDetector(
           onTap: _handleTap,
           child: AnimatedBuilder(
@@ -115,24 +116,7 @@ class _RotatingImageContainerState extends State<RotatingImageContainer>
                 ),
                 // The child text is still here, overlaid on the image
                 child: Center(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.5),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      _controller.isAnimating
-                          ? "Animating...\nTap to Pause"
-                          : "Paused\nTap to Resume",
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                      ),
-                    ),
-                  ),
+                  child:SizedBox()
                 ),
               ),
             ),

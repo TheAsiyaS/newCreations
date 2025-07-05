@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:new_creations/animation/beehive.Create.dart';
+import 'package:new_creations/animation/rectangleup.dart';
 
 
 void main() {
@@ -17,6 +18,6 @@ class MyApp extends StatelessWidget {
         darkTheme: ThemeData(
           brightness: Brightness.dark,
         ),
-        home: BeehiveAnimationPage());
+        home: const RotatingImageContainer());
   }
 }
