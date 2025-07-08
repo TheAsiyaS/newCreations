@@ -18,6 +18,6 @@ class MyApp extends StatelessWidget {
         darkTheme: ThemeData(
           brightness: Brightness.dark,
         ),
-        home: const RotatingImageContainer());
+        home: const ImageStackScreen());
   }
 }
