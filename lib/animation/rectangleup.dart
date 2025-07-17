@@ -1,208 +1,286 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 
+// Data model for our content
+class ContentItem {
+  final String imagePath;
+  final String title;
+  final String description;
 
-class ImageStackScreen extends StatefulWidget {
-  const ImageStackScreen({super.key});
-
-  @override
-  State<ImageStackScreen> createState() => _ImageStackScreenState();
+  ContentItem({
+    required this.imagePath,
+    required this.title,
+    required this.description,
+  });
 }
 
-class _ImageStackScreenState extends State<ImageStackScreen> {
-  // The index of the card currently in the center
+// Enum to manage the animation sequence state
+enum AnimationPhase {
+  initialStack,
+  exploding,
+  consolidating,
+  mainView,
+}
+
+class ComplexAnimationScreen extends StatefulWidget {
+  const ComplexAnimationScreen({super.key});
+
+  @override
+  State<ComplexAnimationScreen> createState() => _ComplexAnimationScreenState();
+}
+
+class _ComplexAnimationScreenState extends State<ComplexAnimationScreen> {
+  // --- STATE VARIABLES ---
+  AnimationPhase _phase = AnimationPhase.initialStack;
   int _currentIndex = 0;
+  Timer? _loopingTimer;
 
-  // --- DATA STORED IN PARALLEL LISTS ---
-  // Instead of one list of objects, we have multiple lists.
-  // IMPORTANT: Ensure all lists have the same number of items!
-
-  final List<String> _imagePaths = [
-     'https://images.pexels.com/photos/736230/pexels-photo-736230.jpeg?cs=srgb&dl=pexels-jonaskakaroto-736230.jpg&fm=jpg',
-    'https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/Bachelor%27s_button%2C_Basket_flower%2C_Boutonniere_flower%2C_Cornflower_-_3.jpg/960px-Bachelor%27s_button%2C_Basket_flower%2C_Boutonniere_flower%2C_Cornflower_-_3.jpg',
-    'https://hips.hearstapps.com/hmg-prod/images/cosmos-flowers-against-the-blue-sky-low-angle-royalty-free-image-1720283935.jpg?crop=0.536xw:1.00xh;0.141xw,0&resize=980:*',
-    'https://hips.hearstapps.com/hmg-prod/images/bright-forget-me-nots-royalty-free-image-1677788394.jpg',
-    'https://peppyflora.com/wp-content/uploads/2021/03/Mogra-Beli-Flower-Jasminum-Sambac-3x4-Product-Peppyflora-01-a-Moz.jpg',
+  // --- DATA ---
+  // IMPORTANT: Make sure you have 5 images in your assets/images folder
+  final List<ContentItem> _contentItems = [
+    ContentItem(imagePath: 'assets/images/item1.jpg', title: 'Forest Canopy', description: 'Sunlight filtering through the dense green leaves of the forest.'),
+    ContentItem(imagePath: 'assets/images/item2.jpg', title: 'Ocean Sunset', description: 'The vibrant colors of the sun setting over the calm ocean waves.'),
+    ContentItem(imagePath: 'assets/images/item3.jpg', title: 'Mountain Peaks', description: 'Snow-capped mountains touching the clear blue sky.'),
+    ContentItem(imagePath: 'assets/images/item4.jpg', title: 'Urban Lights', description: 'The bustling energy of a city illuminated at night.'),
+    ContentItem(imagePath: 'assets/images/item5.jpg', title: 'Desert Dunes', description: 'The endless, rolling sand dunes of a vast desert landscape.'),
   ];
 
-  final List<String> _titles = [
-    'Majestic Lion',
-    'City at Night',
-    'Vibrant Tulip',
-    'Snowy Peaks',
-    'The Open Road',
-  ];
+  // --- LIFECYCLE METHODS ---
+  @override
+  void initState() {
+    super.initState();
+    _startAnimationSequence();
+  }
 
-  final List<String> _descriptions = [
-    'The king of the savannah, known for its powerful roar.',
-    'A bustling metropolis illuminated by a million lights.',
-    'A beautiful flower symbolizing deep love.',
-    'Breathtaking view from the top of the world.',
-    'An invitation to a new adventure.',
-  ];
+  @override
+  void dispose() {
+    _loopingTimer?.cancel();
+    super.dispose();
+  }
 
-  // Function to go to the next card
-  void _nextImage() {
-    setState(() {
-      // We use the length of any of the lists (they should all be the same)
-      _currentIndex = (_currentIndex + 1) % _imagePaths.length;
+  // --- ANIMATION CONTROL ---
+  void _startAnimationSequence() {
+    // After 0.5s, trigger the explosion
+    Future.delayed(const Duration(milliseconds: 500), () {
+      if (mounted) setState(() => _phase = AnimationPhase.exploding);
+    });
+
+    // After 1.5s total, trigger consolidation to circles at the bottom
+    Future.delayed(const Duration(milliseconds: 1500), () {
+      if (mounted) setState(() => _phase = AnimationPhase.consolidating);
+    });
+
+    // After 2.5s total, show the main content view
+    Future.delayed(const Duration(milliseconds: 2500), () {
+      if (mounted) {
+        setState(() => _phase = AnimationPhase.mainView);
+        // After another 2s, start the automatic looping
+        _startLoopingTimer(delay: const Duration(seconds: 2));
+      }
     });
   }
 
-  // Function to go to the previous card
-  void _previousImage() {
-    setState(() {
-      _currentIndex =
-          (_currentIndex - 1 + _imagePaths.length) % _imagePaths.length;
+  void _startLoopingTimer({Duration delay = Duration.zero}) {
+    _loopingTimer?.cancel();
+    _loopingTimer = Timer(delay, () {
+      _loopingTimer = Timer.periodic(const Duration(seconds: 2), (timer) {
+        _changeContent((_currentIndex + 1) % _contentItems.length);
+      });
     });
   }
 
+  void _changeContent(int index, {bool fromUser = false}) {
+    setState(() => _currentIndex = index);
+    if (fromUser) {
+      // If user interacts, restart the timer for the next auto-change
+      _startLoopingTimer(delay: const Duration(seconds: 2));
+    }
+  }
+
+  // --- BUILD METHOD ---
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Image Stack Animation'),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // The main animated image stack
-            Expanded(
-              flex: 3,
-              child: _buildImageStack(),
-            ),
-
-            // The animated text area
-            Expanded(
-              flex: 2,
-              child: _buildTextContent(),
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
+      appBar: AppBar(title: const Text('Complex Animation Sequence')),
+      body: Stack(
+        alignment: Alignment.center,
         children: [
-          FloatingActionButton(
-            onPressed: _previousImage,
-            heroTag: 'prev',
-            child: const Icon(Icons.arrow_back),
-          ),
-          const SizedBox(width: 10),
-          FloatingActionButton(
-            onPressed: _nextImage,
-            heroTag: 'next',
-            child: const Icon(Icons.arrow_forward),
-          ),
+          // This builds the 5 containers and animates them through all phases
+          ..._buildAnimatedContainers(),
+
+          // This builds the main content view (large image + text)
+          // It only becomes visible in the final phase
+          _buildMainContentView(),
         ],
       ),
     );
   }
 
-  /// Builds the text content with an AnimatedSwitcher for smooth transitions.
-  Widget _buildTextContent() {
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 500),
-      transitionBuilder: (Widget child, Animation<double> animation) {
-        return FadeTransition(
-          opacity: animation,
-          child: SlideTransition(
-            position: Tween<Offset>(
-              begin: const Offset(0.0, 0.5),
-              end: Offset.zero,
-            ).animate(animation),
-            child: child,
-          ),
-        );
-      },
-      child: Padding(
-        key: ValueKey<int>(_currentIndex), // IMPORTANT
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // Access the title from the `_titles` list
-            Text(
-              _titles[_currentIndex],
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-            ),
-            const SizedBox(height: 10),
-            // Access the description from the `_descriptions` list
-            Text(
-              _descriptions[_currentIndex],
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyLarge,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  // --- WIDGET BUILDER HELPERS ---
 
-  /// Builds the stack of cards.
-  Widget _buildImageStack() {
+  /// Builds the 5 animating containers
+  List<Widget> _buildAnimatedContainers() {
     final screenSize = MediaQuery.of(context).size;
 
-    // Here, we iterate over the `_imagePaths` list directly.
-    final stackedItems = _imagePaths.asMap().entries.map((entry) {
-      final int index = entry.key;
-      final String imagePath = entry.value;
+    // Positions for the 'exploding' phase
+    final centerPos = Offset(screenSize.width / 2, screenSize.height / 2.5);
+    const explodOffset = 120.0;
+    final List<Offset> explodedPositions = [
+      centerPos, // Center
+      Offset(centerPos.dx, centerPos.dy - explodOffset), // Top
+      Offset(centerPos.dx, centerPos.dy + explodOffset), // Bottom
+      Offset(centerPos.dx - explodOffset, centerPos.dy), // Left
+      Offset(centerPos.dx + explodOffset, centerPos.dy), // Right
+    ];
 
-      final isCurrent = index == _currentIndex;
-      final isSecond = index == (_currentIndex + 1) % _imagePaths.length;
-      final isThird = index == (_currentIndex + 2) % _imagePaths.length;
+    // Positions for the 'consolidating' phase (circles at the bottom)
+    final double totalCircleWidth = (5 * 50.0) + (4 * 10.0);
+    final double bottomStartX = (screenSize.width - totalCircleWidth) / 2;
+    final List<Offset> bottomPositions = List.generate(
+      5,
+      (i) => Offset(bottomStartX + i * 60.0, screenSize.height - 120),
+    );
 
-      double top = screenSize.height;
-      double scale = 0.7;
+    return List.generate(5, (i) {
+      Offset targetPosition;
+      double targetWidth = 100.0;
+      double targetHeight = 200.0;
+      BoxShape shape = BoxShape.rectangle;
+      BorderRadius borderRadius = BorderRadius.circular(12);
 
-      if (isCurrent) {
-        top = screenSize.height * 0.15;
-        scale = 1.0;
-      } else if (isSecond) {
-        top = screenSize.height * 0.35;
-        scale = 0.9;
-      } else if (isThird) {
-        top = screenSize.height * 0.38;
-        scale = 0.8;
+      switch (_phase) {
+        case AnimationPhase.initialStack:
+          targetPosition = centerPos;
+          break;
+        case AnimationPhase.exploding:
+          targetPosition = explodedPositions[i];
+          break;
+        case AnimationPhase.consolidating:
+        case AnimationPhase.mainView:
+          targetPosition = bottomPositions[i];
+          targetWidth = 50.0;
+          targetHeight = 50.0;
+          shape = BoxShape.circle;
+          borderRadius = BorderRadius.zero; // Not needed for circle shape
+          break;
       }
 
       return AnimatedPositioned(
         duration: const Duration(milliseconds: 700),
-        curve: Curves.fastOutSlowIn,
-        top: top,
-        left: 0,
-        right: 0,
-        child: AnimatedScale(
-          duration: const Duration(milliseconds: 700),
-          curve: Curves.fastOutSlowIn,
-          scale: scale,
-          child: Transform.rotate(
-            angle: isCurrent ? 0 : -0.1 * (index - _currentIndex),
-            child: Card(
-              elevation: 8,
-              clipBehavior: Clip.antiAlias,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15.0),
-              ),
-              // Use the `imagePath` directly from our list
-              child: Image.asset(
-                imagePath,
+        curve: Curves.easeInOutCubic,
+        top: targetPosition.dy - (targetHeight / 2),
+        left: targetPosition.dx - (targetWidth / 2),
+        child: GestureDetector(
+          onTap: _phase == AnimationPhase.mainView
+              ? () => _changeContent(i, fromUser: true)
+              : null,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 700),
+            curve: Curves.easeInOutCubic,
+            width: targetWidth,
+            height: targetHeight,
+            decoration: BoxDecoration(
+              color: _phase == AnimationPhase.mainView && i == _currentIndex
+                  ? Colors.blueAccent
+                  : Colors.grey.shade300,
+              shape: shape,
+              borderRadius: shape == BoxShape.rectangle ? borderRadius : null,
+              image: DecorationImage(
+                image: AssetImage(_contentItems[i].imagePath),
                 fit: BoxFit.cover,
-                height: screenSize.height * 0.35,
               ),
+              border: _phase == AnimationPhase.mainView && i == _currentIndex
+                  ? Border.all(color: Colors.white, width: 3)
+                  : null,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  blurRadius: 8,
+                  spreadRadius: 2,
+                )
+              ],
             ),
           ),
         ),
       );
-    }).toList();
+    });
+  }
 
-    return Stack(
-      alignment: Alignment.center,
-      children: stackedItems.reversed.toList(),
+  /// Builds the main content view that appears in the last phase
+  Widget _buildMainContentView() {
+    final item = _contentItems[_currentIndex];
+
+    return AnimatedOpacity(
+      opacity: _phase == AnimationPhase.mainView ? 1.0 : 0.0,
+      duration: const Duration(milliseconds: 500),
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 150.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // Main Animated Image
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 500),
+              transitionBuilder: (child, animation) =>
+                  FadeTransition(opacity: animation, child: child),
+              child: Container(
+                key: ValueKey<String>(item.imagePath),
+                width: 200,
+                height: 400,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  image: DecorationImage(
+                    image: AssetImage(item.imagePath),
+                    fit: BoxFit.cover,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.3),
+                      blurRadius: 15,
+                      offset: const Offset(0, 5),
+                    )
+                  ],
+                ),
+              ),
+            ),
+
+            const SizedBox(width: 20),
+
+            // Animated Text Content
+            Expanded(
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 500),
+                transitionBuilder: (child, animation) {
+                  final slideAnimation = Tween<Offset>(
+                          begin: const Offset(0.0, 0.3), end: Offset.zero)
+                      .animate(animation);
+                  return FadeTransition(
+                    opacity: animation,
+                    child: SlideTransition(position: slideAnimation, child: child),
+                  );
+                },
+                child: Column(
+                  key: ValueKey<String>(item.title),
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      item.title,
+                      style: Theme.of(context)
+                          .textTheme
+                          .headlineSmall
+                          ?.copyWith(fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(item.description, style: Theme.of(context).textTheme.bodyLarge),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

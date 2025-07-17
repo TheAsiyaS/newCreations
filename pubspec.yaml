@@ -41,6 +41,7 @@ dependencies:
   flutter_bloc: ^9.1.1
   freezed_annotation: ^3.0.0 #for making anotations for freezed(eg: @freezed)
   audioplayers: ^6.4.0
+  google_fonts: ^6.2.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
