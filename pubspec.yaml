@@ -42,6 +42,11 @@ dependencies:
   freezed_annotation: ^3.0.0 #for making anotations for freezed(eg: @freezed)
   audioplayers: ^6.4.0
   google_fonts: ^6.2.1
+  google_sign_in: ^7.1.1
+  http: ^1.4.0
+  firebase_auth: ^5.7.0
+  firebase_core: ^3.15.2
+  cloud_firestore: ^5.6.12
 dev_dependencies:
   flutter_test:
     sdk: flutter
